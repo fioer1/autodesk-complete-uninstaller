@@ -657,7 +657,10 @@ function Stop-TrackedChildProcess {
     }
 
     try {
-        Stop-Process -Id $script:CurrentChildProcessId -Force -ErrorAction Stop
+        $result = & taskkill.exe /T /F /PID $script:CurrentChildProcessId 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Stop-Process -Id $script:CurrentChildProcessId -Force -ErrorAction Stop
+        }
         return $true
     } catch {
         return $false
@@ -816,8 +819,47 @@ function Run-BatCommand {
         Start-PolledJob -JobScript {
             param($command, $workingDir)
             Set-Location $workingDir
-            cmd.exe /c $command | ForEach-Object { "LINE|$_" }
-            "EXITCODE|$LASTEXITCODE"
+            $stdout = [System.IO.Path]::GetTempFileName()
+            $stderr = [System.IO.Path]::GetTempFileName()
+            try {
+                $process = Start-Process -FilePath "cmd.exe" -ArgumentList @('/d', '/c', $command) `
+                    -WorkingDirectory $workingDir -NoNewWindow -PassThru `
+                    -RedirectStandardOutput $stdout -RedirectStandardError $stderr
+                "PID|$($process.Id)"
+                $position = 0
+
+                $emitOutput = {
+                    if (Test-Path $stdout) {
+                        $reader = [System.IO.File]::Open($stdout, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+                        try {
+                            $reader.Seek($position, [System.IO.SeekOrigin]::Begin) | Out-Null
+                            $stream = New-Object System.IO.StreamReader($reader)
+                            while (-not $stream.EndOfStream) {
+                                "LINE|$($stream.ReadLine())"
+                            }
+                            $position = $reader.Position
+                        } finally {
+                            if ($stream) { $stream.Dispose() }
+                            $reader.Dispose()
+                        }
+                    }
+                }
+
+                while (-not $process.HasExited) {
+                    . $emitOutput
+                    Start-Sleep -Milliseconds 100
+                }
+
+                $process.WaitForExit()
+                . $emitOutput
+                if (Test-Path $stderr) {
+                    Get-Content -LiteralPath $stderr | ForEach-Object { "LINE|$_" }
+                }
+                "EXITCODE|$($process.ExitCode)"
+            } finally {
+                "PID|0"
+                Remove-Item -LiteralPath $stdout, $stderr -Force -ErrorAction SilentlyContinue
+            }
         } -ArgumentList @($cmdExpression, $PSScriptRoot) -IntervalMs 100 `
             -OnData {
                 param($item)
@@ -826,6 +868,11 @@ function Run-BatCommand {
                     Write-CommandOutputLine $text.Substring(5)
                 } elseif ($text -like 'EXITCODE|*') {
                     $script:LastExitCode = [int]$text.Substring(9)
+                } elseif ($text -like 'PID|*') {
+                    $script:CurrentChildProcessId = [int]$text.Substring(4)
+                    if ($script:CurrentChildProcessId -le 0) {
+                        $script:CurrentChildProcessId = $null
+                    }
                 }
             } `
             -OnCompleted {
