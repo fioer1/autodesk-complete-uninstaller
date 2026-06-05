@@ -331,7 +331,7 @@ $script:ScannedProducts = @()
                                    Margin="20,4,0,6"/>
 
                         <Button x:Name="btnFixErr" Style="{StaticResource WarningButton}">
-                            <TextBlock><Run FontSize="15" Text="&#x1F527; "/><Run Text="&#x4FEE;&#x590D; Error 103"/></TextBlock>
+                            <TextBlock><Run FontSize="15" Text="&#x1F527; "/><Run Text="&#x8BCA;&#x65AD; Error 103"/></TextBlock>
                         </Button>
 
                         <Button x:Name="btnFixReboot" Style="{StaticResource WarningButton}">
@@ -677,11 +677,11 @@ function Convert-InputSequenceToCmdExpression {
 
     $lines = @($InputSequence -split "`r?`n" | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
     if ($lines.Count -eq 0) {
-        return "`"$CommandPath`" 2>&1"
+        return "set `"AUTODESK_GUI_MODE=1`" & `"$CommandPath`" 2>&1"
     }
 
     $echoCommands = $lines | ForEach-Object { "echo $_" }
-    return "( $($echoCommands -join ' & ') ) | `"$CommandPath`" 2>&1"
+    return "( $($echoCommands -join ' & ') ) | ( set `"AUTODESK_GUI_MODE=1`" & `"$CommandPath`" 2>&1 )"
 }
 
 function Write-CommandOutputLine {
@@ -1606,28 +1606,28 @@ $controls['btnRestore'].Add_Click({
 
     Show-Panel 'panelConsole'
     Set-Header "创建还原点" "正在创建 Windows 系统还原点..."
-    Run-BatCommand -InputSequence "6`nY`nX`n0" -Description "正在创建系统还原点..."
+    Run-BatCommand -InputSequence "6`nY`nY" -Description "正在创建系统还原点..."
 })
 
 # --- Search Remnants ---
 $controls['btnRemnants'].Add_Click({
     Show-Panel 'panelConsole'
     Set-Header "搜索残留文件" "在系统中搜索所有 Autodesk 残留"
-    Run-BatCommand -InputSequence "7`nX`n0" -Description "正在搜索 Autodesk 残留 (15 项扫描)..."
+    Run-BatCommand -InputSequence "7`n" -Description "正在搜索 Autodesk 残留 (15 项扫描)..."
 })
 
 # --- Full System Audit ---
 $controls['btnAudit'].Add_Click({
     Show-Panel 'panelConsole'
     Set-Header "系统完整审计" "预览所有将被移除的内容"
-    Run-BatCommand -InputSequence "8`nX`n0" -Description "正在运行系统完整审计..."
+    Run-BatCommand -InputSequence "8`n" -Description "正在运行系统完整审计..."
 })
 
-# --- Fix Error 103 ---
+# --- Diagnose Error 103 ---
 $controls['btnFixErr'].Add_Click({
     Show-Panel 'panelConsole'
-    Set-Header "修复 Error 103" "诊断和修复 ODIS 安装器问题"
-    Run-BatCommand -InputSequence "10`nX`n0" -Description "正在诊断 Error 103 / ODIS 问题..."
+    Set-Header "诊断 Error 103" "诊断 ODIS 安装器问题（不自动修复）"
+    Run-BatCommand -InputSequence "10`nN`nN`nN`nN`nN`nN`nN" -Description "正在诊断 Error 103 / ODIS 问题..."
 })
 
 # --- Fix Restart Pending ---
@@ -1645,14 +1645,14 @@ $controls['btnFixReboot'].Add_Click({
 
     Show-Panel 'panelConsole'
     Set-Header "修复重启挂起" "正在清除待处理的重启标志..."
-    Run-BatCommand -InputSequence "11`nX`n0" -Description "正在修复重启挂起状态..."
+    Run-BatCommand -InputSequence "11`n" -Description "正在修复重启挂起状态..."
 })
 
 # --- Backup Templates ---
 $controls['btnBackup'].Add_Click({
     Show-Panel 'panelConsole'
     Set-Header "备份模板" "正在备份自定义模板和设置..."
-    Run-BatCommand -InputSequence "12`nX`n0" -Description "正在备份 Autodesk 模板..."
+    Run-BatCommand -InputSequence "12`nY" -Description "正在备份 Autodesk 模板..."
 })
 
 # --- Stop button ---

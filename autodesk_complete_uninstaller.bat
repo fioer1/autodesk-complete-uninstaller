@@ -206,7 +206,10 @@ echo  NOTE: Windows limits restore points to one per 24 hours.
 echo        This script will temporarily bypass that limit.
 echo.
 set /p "RP_CONF=  Create restore point now? [Y/N]: "
-if /i not "!RP_CONF!"=="Y" goto :main_menu
+if /i not "!RP_CONF!"=="Y" (
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
+    goto :main_menu
+)
 echo. >> "!CLOG!"
 echo ======================================================== >> "!CLOG!"
 echo  CREATE SYSTEM RESTORE POINT >> "!CLOG!"
@@ -231,6 +234,7 @@ echo  Configure - Turn on system protection.
 echo.
 set /p "SR_ENABLE=  Try to enable it now? [Y/N]: "
 if /i not "!SR_ENABLE!"=="Y" (
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
     pause
     goto :main_menu
 )
@@ -241,6 +245,7 @@ if !errorlevel! equ 0 (
 )
 if !errorlevel! neq 0 (
     echo  FAILED - enable manually via System Properties.
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
     pause
     goto :main_menu
 )
@@ -280,6 +285,7 @@ echo.
 echo  You can still continue with uninstallation.
 echo.
 reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v SystemRestorePointCreationFrequency /f >nul 2>&1
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
 pause
 goto :main_menu
 
@@ -291,6 +297,7 @@ reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v 
 echo.
 echo  Restore point created successfully.
 echo.
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -302,6 +309,7 @@ reg delete "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore" /v 
 echo.
 echo  Restore point created successfully.
 echo.
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -478,6 +486,7 @@ if !PROD_COUNT! equ 0 (
         echo  !CYLW!Full Uninstall cannot continue without detected products.!R!
         exit /b 1
     )
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
     pause
     goto :main_menu
 )
@@ -520,6 +529,7 @@ if /i "!AUTO_AFTER_SCAN!"=="full_clean" (
     set "AUTO_AFTER_SCAN="
     goto :full_clean
 )
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -530,10 +540,10 @@ REM ============================================================
 cls
 if !PROD_COUNT! equ 0 (
     echo.
-    echo  No products scanned yet. Scanning now before full clean...
+    echo  No products scanned yet. Run option [1] first.
     echo.
-    set "AUTO_AFTER_SCAN=full_clean"
-    goto :scan_products
+    pause
+    goto :main_menu
 )
 echo.
 echo  ========================================================
@@ -635,10 +645,10 @@ REM ============================================================
 cls
 if !PROD_COUNT! equ 0 (
     echo.
-    echo  No products scanned yet. Run option [1] first.
+    echo  No products scanned yet. Scanning now before full clean...
     echo.
-    pause
-    goto :main_menu
+    set "AUTO_AFTER_SCAN=full_clean"
+    goto :scan_products
 )
 echo.
 echo  ========================================================
@@ -668,6 +678,7 @@ echo.
 set /p "FC_CONF=  Type YES to proceed: "
 if /i not "!FC_CONF!"=="YES" (
     echo  Aborted.
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
     pause
     goto :main_menu
 )
@@ -2061,6 +2072,7 @@ echo [!time:~0,8!] Full Clean: Started !FC_START! Completed !time:~0,8! >> "!CLO
 echo. >> "!CLOG!"
 echo --- End of section --- >> "!CLOG!"
 echo. >> "!CLOG!"
+if /i "!AUTODESK_GUI_MODE!"=="1" goto :run_verify
 pause
 goto :run_verify
 
@@ -2081,6 +2093,7 @@ echo.
 set /p "DC_CONF=  Type YES to proceed: "
 if /i not "!DC_CONF!"=="YES" (
     echo  Aborted.
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
     pause
     goto :main_menu
 )
@@ -2747,6 +2760,7 @@ echo  !CCYN!System is ready for fresh Autodesk installation.!R!
 echo  !DIM!If the new installer shows "restart pending", reboot once first.!R!
 echo  !DIM!This is a Windows requirement after system cleanup, not an incomplete uninstall.!R!
 echo.
+if /i "!AUTODESK_GUI_MODE!"=="1" goto :run_verify
 pause
 goto :run_verify
 
@@ -3284,6 +3298,7 @@ echo.
 echo. >> "!CLOG!"
 echo --- End of section --- >> "!CLOG!"
 echo. >> "!CLOG!"
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -3943,6 +3958,7 @@ echo.
 echo. >> "!CLOG!"
 echo --- End of section --- >> "!CLOG!"
 echo. >> "!CLOG!"
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -4225,6 +4241,7 @@ if !E103_ISSUES! equ 0 (
     echo  !CWHT!Log saved to:!R! !DIM!!E103LOG!!R!
     del /f "!E103_EVTTMP!" >nul 2>&1
     echo.
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
     pause
     goto :main_menu
 )
@@ -4466,6 +4483,7 @@ echo.
 echo. >> "!CLOG!"
 echo --- End of section --- >> "!CLOG!"
 echo. >> "!CLOG!"
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -4586,6 +4604,7 @@ echo.
 echo. >> "!CLOG!"
 echo --- End of section --- >> "!CLOG!"
 echo. >> "!CLOG!"
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -4638,6 +4657,7 @@ echo.
 if !BK_FOUND! equ 0 (
     echo  !CYLW!No Autodesk user data found to back up.!R!
     echo.
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
     pause
     goto :main_menu
 )
@@ -4662,6 +4682,7 @@ if /i "!BK_GO!" neq "Y" (
     echo.
     echo  !DIM!Backup cancelled.!R!
     echo.
+    if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 1
     pause
     goto :main_menu
 )
@@ -4705,6 +4726,7 @@ echo.
 echo. >> "!CLOG!"
 echo --- End of section --- >> "!CLOG!"
 echo. >> "!CLOG!"
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 pause
 goto :main_menu
 
@@ -5159,6 +5181,7 @@ echo  VERIFY: !RM! remaining >> "!LOGFILE!"
 echo  VERIFY: !RM! remaining >> "!DIAGFILE!"
 echo  COMPLETED %date% %time% >> "!DIAGFILE!"
 echo.
+if /i "!AUTODESK_GUI_MODE!"=="1" exit /b 0
 set /p "RET=  Return to main menu? [Y/N]: "
 if /i "!RET!"=="Y" goto :main_menu
 pause
