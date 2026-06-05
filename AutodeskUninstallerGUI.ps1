@@ -1,7 +1,7 @@
 ﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
-    Autodesk Universal Uninstaller v5.5 - GUI Edition
+    Autodesk Universal Uninstaller v5.11 - GUI Edition
 .DESCRIPTION
     PowerShell WPF graphical interface for the Autodesk Complete Uninstaller.
     Provides a modern dark-themed UI to manage all uninstallation operations.
