@@ -473,6 +473,11 @@ echo ======================================================== >> "!CLOG!"
 if !PROD_COUNT! equ 0 (
     echo  !CYLW!No Autodesk products detected.!R!
     echo.
+    if /i "!AUTO_AFTER_SCAN!"=="full_clean" (
+        set "AUTO_AFTER_SCAN="
+        echo  !CYLW!Full Uninstall cannot continue without detected products.!R!
+        exit /b 1
+    )
     pause
     goto :main_menu
 )
@@ -511,6 +516,10 @@ for /l %%i in (1,1,!PROD_COUNT!) do (
     echo   [%%i] P!P_PRIO_%%i! !P_TYPE_%%i! !P_NAME_%%i! >> "!LOGFILE!"
     echo   UNINST: !P_UNINST_%%i! >> "!LOGFILE!"
 )
+if /i "!AUTO_AFTER_SCAN!"=="full_clean" (
+    set "AUTO_AFTER_SCAN="
+    goto :full_clean
+)
 pause
 goto :main_menu
 
@@ -521,10 +530,10 @@ REM ============================================================
 cls
 if !PROD_COUNT! equ 0 (
     echo.
-    echo  No products scanned yet. Run option [1] first.
+    echo  No products scanned yet. Scanning now before full clean...
     echo.
-    pause
-    goto :main_menu
+    set "AUTO_AFTER_SCAN=full_clean"
+    goto :scan_products
 )
 echo.
 echo  ========================================================

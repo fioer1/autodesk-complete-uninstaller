@@ -1567,8 +1567,8 @@ $controls['btnFullClean'].Add_Click({
     Show-Panel 'panelConsole'
     Set-Header "完全卸载 + 深度清理" "正在移除所有 Autodesk 产品和痕迹..."
 
-    # First scan products, then pipe "1" to scan, wait, then "3" and "YES" and "N" (no installer cleanup) and "N" (no restore point)
-    Run-BatCommand -InputSequence "1`nX`n3`nYES`nN`nN`nN" -Description "完全卸载 + 深度清理 (所有阶段)"
+    # Option 3 auto-scans inside the batch file when no product scan has run yet.
+    Run-BatCommand -InputSequence "3`nYES`nN`nN`nN" -Description "完全卸载 + 深度清理 (所有阶段)"
 })
 
 # --- Deep Clean Only ---
