@@ -58,8 +58,8 @@ https://github.com/user-attachments/assets/988e9837-abfa-4a4b-9aa0-c91dc8f088c4
 - **Registry backup** before deletion — `.reg` export files saved to Desktop
 - **System Restore Point** creation (optional) with 24-hour limit bypass
 - **Comprehensive diagnostics** — generates `diagnostics.log`, `uninstall_log.txt`, and `verify_details.txt` for troubleshooting
-- **12-point deep verification scan** — checks products, processes, services, folders, user data, registry hives, COM/CLSID deep scan, legacy licensing, env variables, shortcuts, tasks, and firewall rules
-- **Remnant search tool** — scans entire C: drive for any Autodesk folders, deep-searches registry for file associations and COM objects
+- **16-point deep verification scan** — checks products, processes, services, folders, user data, registry hives, COM/CLSID deep scan, legacy licensing, env variables, shortcuts, tasks, firewall rules, IFEO debugger blocks, pending file renames, and hosts entries
+- **Remnant search tool** — 15-point full system scan for Autodesk folders, registry file associations, COM objects, shell extensions, processes, services, pending file renames, and hosts entries
 - **No reboot required** — achieves full clean in a single run on real machines
 - **Single `.bat` file** — no dependencies, no installation, no PowerShell execution policy issues
 
@@ -98,11 +98,11 @@ https://github.com/user-attachments/assets/988e9837-abfa-4a4b-9aa0-c91dc8f088c4
 | **[2]** | **Uninstall Selected** — Pick specific products to remove individually |
 | **[3]** | **Full Uninstall + Deep Clean** — Complete removal: uninstall all products + remove all traces |
 | **[4]** | **Deep Clean Only** — Remove remnants without product uninstall (for post-Control Panel cleanup) |
-| **[5]** | **Final Verification** — 12-point deep scan to confirm zero remnants |
+| **[5]** | **Final Verification** — 16-point deep scan to confirm zero remnants |
 | **[6]** | **Create System Restore Point** — Create a restore point before making changes |
-| **[7]** | **Search for ALL Autodesk Remnants** — Full system scan — folders, registry deep search, processes, services |
-| **[8]** | **Full System Audit** — 13-point read-only preview of everything that would be removed, with disk space calculation |
-| **[10]** | **Fix Error 103** — 9-point diagnostic and repair for ODIS installer issues |
+| **[7]** | **Search for ALL Autodesk Remnants** — 15-point full system scan: folders, registry deep search, processes, services, pending renames, hosts |
+| **[8]** | **Full System Audit** — 17-point read-only preview of everything that would be removed, with disk space calculation |
+| **[10]** | **Fix Error 103** — 10-point diagnostic and repair for ODIS installer issues |
 | **[0]** | **Exit** |
 
 ---
@@ -123,7 +123,7 @@ https://github.com/user-attachments/assets/988e9837-abfa-4a4b-9aa0-c91dc8f088c4
 | **H** | Backs up and deletes all Autodesk registry keys |
 | **H2** | Cleans user file associations (DWGTrueView, AutoCAD class keys, COM CLSIDs, MuiCache) |
 | **I** | Removes Autodesk Genuine Service (always last) |
-| **J** | Runs 12-point final verification |
+| **J** | Runs 16-point final verification |
 
 ---
 
@@ -223,8 +223,8 @@ The FlexNet Licensing Service 64 is shared between Autodesk and Adobe. If you us
 | Products remain after uninstall | Run [4] Deep Clean to force-remove |
 | ODIS uninstaller fails (exit:1) | Phase C2 automatically force-cleans these |
 | Folders show as LOCKED | Tool uses takeown/icacls + Explorer restart; run Deep Clean again |
-| Verification shows items in [7/12] | Run [4] Deep Clean to remove file associations |
-| Error 103 during install | Run [10] Fix Error 103 for 9-point ODIS diagnosis and guided repair |
+| Verification shows items in [7/16] | Run [4] Deep Clean to remove file associations |
+| Error 103 during install | Run [10] Fix Error 103 for 10-point ODIS diagnosis and guided repair |
 | Antivirus blocks or quarantines the script | Add an exclusion for the `.bat` file or temporarily disable real-time protection; this is a false positive |
 | Windows SmartScreen blocks the file | Click **More info** > **Run anyway** — the script is unsigned but open source |
 
@@ -245,7 +245,7 @@ A: No. The tool achieves a verified zero-remnant clean on real machines in a sin
 A: Typically 5–50+ GB depending on installed products and the `C:\Autodesk` staging folder.
 
 **Q: Autodesk installer gives Error 103. What do I do?**
-A: Run option [10] Fix Error 103 — it performs a 9-point diagnostic covering ODIS lock files, debugger keys, service state, ODIS infrastructure, VC++ redistributables, and Windows Event Viewer analysis. Each issue found can be repaired with a Y/N prompt.
+A: Run option [10] Fix Error 103 — it performs a 10-point diagnostic covering ODIS lock files, debugger keys, service state, ODIS infrastructure, VC++ redistributables, Windows Event Viewer analysis, and hosts file checks. Each issue found can be repaired with a Y/N prompt.
 
 **Q: My antivirus flagged the script. Is it safe?**
 A: Yes. The script is a plain-text `.bat` file — you can read every line in Notepad before running it. Antivirus software sometimes flags unsigned batch scripts that modify the registry. Add an exclusion or temporarily disable real-time protection to run it.

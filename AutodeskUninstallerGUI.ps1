@@ -1543,8 +1543,8 @@ $controls['btnDeepClean'].Add_Click({
 # --- Final Verification ---
 $controls['btnVerify'].Add_Click({
     Show-Panel 'panelConsole'
-    Set-Header "最终验证" "12 项深度系统扫描"
-    Run-BatCommand -InputSequence "5`n" -Description "正在运行 12 项验证扫描..."
+    Set-Header "最终验证" "16 项深度系统扫描"
+    Run-BatCommand -InputSequence "5`n" -Description "正在运行 16 项验证扫描..."
 })
 
 # --- Create Restore Point ---
@@ -1566,7 +1566,7 @@ $controls['btnRestore'].Add_Click({
 $controls['btnRemnants'].Add_Click({
     Show-Panel 'panelConsole'
     Set-Header "搜索残留文件" "在系统中搜索所有 Autodesk 残留"
-    Run-BatCommand -InputSequence "7`nX`n0" -Description "正在搜索 Autodesk 残留 (11 项扫描)..."
+    Run-BatCommand -InputSequence "7`nX`n0" -Description "正在搜索 Autodesk 残留 (15 项扫描)..."
 })
 
 # --- Full System Audit ---
