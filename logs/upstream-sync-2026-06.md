@@ -80,3 +80,32 @@ git -c http.proxy=http://127.0.0.1:7892 -c https.proxy=http://127.0.0.1:7892 ...
 ## Follow-up Needed
 
 Update the global Git proxy from `127.0.0.1:7890` to a working proxy such as `127.0.0.1:7892`, or remove it if direct GitHub access is available. No code follow-up is needed for this sync.
+
+## Post-sync GUI Button Mapping Debug - 2026-06-05T20:29:14.4427448+08:00
+
+- Trigger: User asked to re-check whether the other GUI buttons match the original batch menu after Full Uninstall appeared to run option 10.
+- Local code commit before this debug pass: `f2d352d`
+- GUI fix commit: `f50a7c5 fix: align GUI button batch mappings`
+- Upstream commit context: `ae086ab0291d52ceab83e3f5d37dfdc431d29da2`
+- Files changed:
+  - `AutodeskUninstallerGUI.ps1`
+  - `autodesk_complete_uninstaller.bat`
+  - `tests/gui_button_batch_mapping_regression.ps1`
+  - `tests/gui_full_clean_sequence_regression.ps1`
+- Conflict decisions: no merge or rebase conflicts occurred in this debug pass.
+- Findings:
+  - Several GUI buttons still sent stale `X`/`0` menu-navigation input after invoking batch options 6, 7, 8, 10, 11, and 12.
+  - `AUTODESK_GUI_MODE=1` was initially placed on the left side of the pipe, which does not reliably set the variable for the batch process on the right side.
+  - The previous Full Clean auto-scan patch had also affected the Option 2 no-scan branch; Option 2 now returns to the menu as before, while Option 3 owns the auto-scan path.
+- Fixes:
+  - GUI buttons now map directly to batch options 3, 4, 5, 6, 7, 8, 10, 11, and 12 without stale pause/menu-navigation input.
+  - Error 103 is labeled as diagnosis in the GUI and declines repair prompts by default.
+  - Piped GUI commands now set `AUTODESK_GUI_MODE=1` on the batch side of the pipe.
+  - Batch GUI mode exits after one-shot operations instead of pausing and returning to `:main_menu`.
+- Test results:
+  - All 12 PowerShell GUI regression scripts passed.
+  - PowerShell AST parse for `AutodeskUninstallerGUI.ps1` passed.
+  - `git diff --check` passed.
+  - A direct cmd pipe check confirmed `AUTODESK_GUI_MODE=1` is visible on the right side of the pipe.
+- Monthly sync marked successful: yes; this was a post-sync GUI/debug follow-up, not a new upstream sync.
+- Follow-up needed: none for the GUI button mapping. The global Git proxy note above still applies.
